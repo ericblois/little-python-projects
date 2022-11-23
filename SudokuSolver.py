@@ -1,5 +1,6 @@
 from typing import List
 import random
+import time
 
 class SudokuSolver:
 
@@ -21,12 +22,14 @@ class SudokuSolver:
                 count -= 1
         return board
 
+    # Solves the sudoku in-place
     @staticmethod
     def solve_sudoku(board: List[List[str]]) -> None:
         SudokuSolver.__solve_helper(board, 0, 0)
     
-    # Recursive helper method to solve the sudoku
+    # Recursive helper method to solve the sudoku (O(n^3) time)
     def __solve_helper(board: List[List[str]], row: int, col: int) -> bool:
+        # Check if cell is already filled
         if board[row][col] != '.':
             if col < 8:
                 return SudokuSolver.__solve_helper(board, row, col + 1)
@@ -34,7 +37,7 @@ class SudokuSolver:
                 return SudokuSolver.__solve_helper(board, row + 1, 0)
             else:
                 return SudokuSolver.__is_valid(board)
-        
+        # Try all viable values for the cell
         for val in SudokuSolver.__get_possible_vals(board, row, col):
             board[row][col] = val
             result = False
@@ -49,7 +52,7 @@ class SudokuSolver:
         board[row][col] = '.'
         return False
 
-    # Returns a list of possible values for the given cell           
+    # Returns a list of possible values for the given cell (O(1) time)
     def __get_possible_vals(board: List[List[str]], row: int, col: int) -> List[str]:
         rowVals = [val for val in board[row] if val != '.']
         colVals = [board[k][col] for k in range(9) if board[k][col] != '.']
@@ -90,6 +93,7 @@ class SudokuSolver:
                         return False
         return True
 
+'''
 board = [
     ["5","3",".",".","7",".",".",".","."],
     ["6",".",".","1","9","5",".",".","."],
@@ -101,8 +105,22 @@ board = [
     [".",".",".","4","1","9",".",".","5"],
     [".",".",".",".","8",".",".","7","9"]
 ]
+'''
+# One of the hardest sudoku puzzles (https://abcnews.go.com/blogs/headlines/2012/06/can-you-solve-the-hardest-ever-sudoku)
+# Takes quite a while to solve
+board = [
+    ["8",".",".",".",".",".",".",".","."],
+    [".",".","3","6",".",".",".",".","."],
+    [".","7",".",".","9",".","2",".","."],
+    [".","5",".",".",".","7",".",".","."],
+    [".",".",".",".","4","5","7",".","."],
+    [".",".",".","1",".",".",".","3","."],
+    [".",".","1",".",".",".",".","6","8"],
+    [".",".","8","5",".",".",".","1","."],
+    [".","9",".",".",".",".","4",".","."]
+]
 # Generate a board with 17 cells filled
-board = SudokuSolver.generate_board()
+#board = SudokuSolver.generate_board()
 print('Initial board:')
 for row in board:
     print(*row)
@@ -110,3 +128,14 @@ SudokuSolver.solve_sudoku(board)
 print('Solved board:')
 for row in board:
     print(*row)
+
+'''
+total_time = 0
+num = 10
+for i in range(num):
+    board = SudokuSolver.generate_board()
+    start = time.time()
+    SudokuSolver.solve_sudoku(board)
+    total_time += time.time() - start
+print(f'Total time ({num} solves): {total_time}')
+'''

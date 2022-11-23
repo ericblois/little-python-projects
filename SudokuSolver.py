@@ -1,13 +1,13 @@
 from typing import List
 import random
 
-class Solution:
+class SudokuSolver:
 
     @staticmethod
     def generate_board(num_cells: int = 17) -> List[List[str]]:
         board = [['.' for _ in range(9)] for _ in range(9)]
         # Solve an empty board to generate a random valid board
-        Solution.solve_sudoku(board)
+        SudokuSolver.solve_sudoku(board)
         # Ensure number of cells is valid
         num = num_cells if num_cells >= 17 else 17
         num = num if num <= 80 else 80
@@ -23,27 +23,27 @@ class Solution:
 
     @staticmethod
     def solve_sudoku(board: List[List[str]]) -> None:
-        Solution.__solve_helper(board, 0, 0)
+        SudokuSolver.__solve_helper(board, 0, 0)
     
     # Recursive helper method to solve the sudoku
     def __solve_helper(board: List[List[str]], row: int, col: int) -> bool:
         if board[row][col] != '.':
             if col < 8:
-                return Solution.__solve_helper(board, row, col + 1)
+                return SudokuSolver.__solve_helper(board, row, col + 1)
             elif row < 8:
-                return Solution.__solve_helper(board, row + 1, 0)
+                return SudokuSolver.__solve_helper(board, row + 1, 0)
             else:
-                return Solution.__is_valid(board)
+                return SudokuSolver.__is_valid(board)
         
-        for val in Solution.__get_possible_vals(board, row, col):
+        for val in SudokuSolver.__get_possible_vals(board, row, col):
             board[row][col] = val
             result = False
             if col < 8:
-                result = Solution.__solve_helper(board, row, col + 1)
+                result = SudokuSolver.__solve_helper(board, row, col + 1)
             elif row < 8:
-                result = Solution.__solve_helper(board, row + 1, 0)
+                result = SudokuSolver.__solve_helper(board, row + 1, 0)
             else:
-                result = Solution.__is_valid(board)
+                result = SudokuSolver.__is_valid(board)
             if result:
                 return True
         board[row][col] = '.'
@@ -102,11 +102,11 @@ board = [
     [".",".",".",".","8",".",".","7","9"]
 ]
 # Generate a board with 17 cells filled
-board = Solution.generate_board()
+board = SudokuSolver.generate_board()
 print('Initial board:')
 for row in board:
     print(*row)
-Solution.solve_sudoku(board)
+SudokuSolver.solve_sudoku(board)
 print('Solved board:')
 for row in board:
     print(*row)

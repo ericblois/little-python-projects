@@ -8,7 +8,7 @@ class SudokuSolver:
     def generate_board(num_cells: int = 17) -> List[List[str]]:
         board = [['.' for _ in range(9)] for _ in range(9)]
         # Solve an empty board to generate a random valid board
-        SudokuSolver.solve_sudoku(board)
+        SudokuSolver.__solve_helper(board, 0, 0, True)
         # Ensure number of cells is valid
         num = num_cells if num_cells >= 17 else 17
         num = num if num <= 80 else 80
@@ -28,7 +28,7 @@ class SudokuSolver:
         SudokuSolver.__solve_helper(board, 0, 0)
     
     # Recursive helper method to solve the sudoku (O(n^3) time)
-    def __solve_helper(board: List[List[str]], row: int, col: int) -> bool:
+    def __solve_helper(board: List[List[str]], row: int, col: int, generate = False) -> bool:
         # Check if cell is already filled
         if board[row][col] != '.':
             if col < 8:
@@ -38,7 +38,7 @@ class SudokuSolver:
             else:
                 return SudokuSolver.__is_valid(board)
         # Try all viable values for the cell
-        for val in SudokuSolver.__get_possible_vals(board, row, col):
+        for val in SudokuSolver.__get_possible_vals(board, row, col, generate):
             board[row][col] = val
             result = False
             if col < 8:
@@ -53,19 +53,30 @@ class SudokuSolver:
         return False
 
     # Returns a list of possible values for the given cell (O(1) time)
-    def __get_possible_vals(board: List[List[str]], row: int, col: int) -> List[str]:
-        rowVals = [val for val in board[row] if val != '.']
-        colVals = [board[k][col] for k in range(9) if board[k][col] != '.']
+    def __get_possible_vals(board: List[List[str]], row: int, col: int, generate = False) -> List[str]:
+        remaining = [str(i) for i in range(1, 10)]
+        if generate:
+            random.shuffle(remaining)
+        # Row
+        for val in board[row]:
+            if val != '.' and val in remaining:
+                remaining.remove(val)
+        # Column
+        for i in range(9):
+            val = board[i][col]
+            if val != '.' and val in remaining:
+                remaining.remove(val)
         # Square
-        squareVals = []
         startRow = int(row/3)*3
         endRow = startRow + 3
         startCol = int(col/3)*3
         endCol = startCol + 3
         for i in range(startRow, endRow):
             for j in range(startCol, endCol):
-                squareVals.append(board[i][j])
-        return list(set(map(lambda x : str(x), range(1, 10))) - (set(rowVals) | set(colVals) | set(squareVals)))
+                val = board[i][j]
+                if val != '.' and val in remaining:
+                    remaining.remove(val)
+        return remaining
         
     # Returns true if the board is valid, false otherwise
     def __is_valid(board: List[List[str]]) -> bool:
@@ -129,7 +140,7 @@ print('Solved board:')
 for row in board:
     print(*row)
 
-'''
+
 total_time = 0
 num = 10
 for i in range(num):
@@ -138,4 +149,3 @@ for i in range(num):
     SudokuSolver.solve_sudoku(board)
     total_time += time.time() - start
 print(f'Total time ({num} solves): {total_time}')
-'''
